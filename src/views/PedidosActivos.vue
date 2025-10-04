@@ -23,15 +23,14 @@
       <v-col
         v-for="mesa in mesas"
         :key="mesa.id_mesa"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="3"
-        class="d-flex"
+        cols="6"
+        sm="4"
+        md="3"
       >
         <v-card
           :class="mesaCardClasses(mesa)"
-          class="mesa-card-responsive d-flex flex-column align-center justify-center relative w-100"
+          class="pa-4 d-flex flex-column align-center justify-center relative"
+          height="120"
           @click="seleccionarMesa(mesa)"
         >
           <!-- Badge con contador de artículos listos -->
@@ -460,15 +459,7 @@ onUnmounted(() => {
 .relative { position: relative; }
 .cursor-pointer { cursor: pointer; }
 
-
-
-.mesa-card {
-  background: var(--v-theme-surface);
-  transition: box-shadow .2s, transform .1s;
-  min-width: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
+.mesa-card { background: var(--v-theme-surface); transition: box-shadow .2s, transform .1s; }
 .mesa-card:hover { transform: translateY(-2px); }
 .mesa-ocupada   { background: #ef5350; color: #fff; }
 .mesa-reservada { background: #ffcc80; }
@@ -476,34 +467,6 @@ onUnmounted(() => {
 .mesa-pago      { background: #ce93d8; color: #fff; } /* pendiente de pago */
 .mesa-libre     { background: #a5d6a7; }
 .mesa-pendiente { background: #cfd8dc; } /* gris azulado suave */
-
-.mesa-card-responsive {
-  padding: 18px 12px;
-  min-height: 100px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-@media (max-width: 600px) {
-  .mesa-card-responsive {
-    min-height: 90px;
-    padding: 12px 6px;
-    font-size: 0.97rem;
-  }
-  .v-icon {
-    font-size: 22px !important;
-  }
-}
-@media (max-width: 600px) {
-  .mesa-card {
-    height: 90px !important;
-    padding: 10px !important;
-    font-size: 0.95rem;
-  }
-  .v-icon {
-    font-size: 24px !important;
-  }
-}
 
 .pulse-border {
   box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.8);
