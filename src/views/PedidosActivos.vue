@@ -477,9 +477,10 @@ onUnmounted(() => {
   70%  { box-shadow: 0 0 0 12px rgba(76, 175, 80, 0); }
   100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
 }
+
+.pb-16 {
+  padding-bottom: 110px !important;
+}
+
 </style>
 
-/* Asegura espacio para la barra de navegación inferior en móvil */
-.pb-16 {
-  padding-bottom: 80px !important;
-}
