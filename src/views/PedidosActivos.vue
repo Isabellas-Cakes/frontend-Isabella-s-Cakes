@@ -24,16 +24,14 @@
         v-for="mesa in mesas"
         :key="mesa.id_mesa"
         cols="12"
-        xs="6"
-        sm="4"
-        md="3"
+        sm="6"
+        md="4"
+        lg="3"
         class="d-flex"
       >
         <v-card
           :class="mesaCardClasses(mesa)"
-          class="pa-3 pa-sm-4 d-flex flex-column align-center justify-center relative w-100"
-          height="100"
-          min-width="0"
+          class="mesa-card-responsive d-flex flex-column align-center justify-center relative w-100"
           @click="seleccionarMesa(mesa)"
         >
           <!-- Badge con contador de artículos listos -->
@@ -463,6 +461,7 @@ onUnmounted(() => {
 .cursor-pointer { cursor: pointer; }
 
 
+
 .mesa-card {
   background: var(--v-theme-surface);
   transition: box-shadow .2s, transform .1s;
@@ -477,6 +476,24 @@ onUnmounted(() => {
 .mesa-pago      { background: #ce93d8; color: #fff; } /* pendiente de pago */
 .mesa-libre     { background: #a5d6a7; }
 .mesa-pendiente { background: #cfd8dc; } /* gris azulado suave */
+
+.mesa-card-responsive {
+  padding: 18px 12px;
+  min-height: 100px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .mesa-card-responsive {
+    min-height: 90px;
+    padding: 12px 6px;
+    font-size: 0.97rem;
+  }
+  .v-icon {
+    font-size: 22px !important;
+  }
+}
 @media (max-width: 600px) {
   .mesa-card {
     height: 90px !important;
