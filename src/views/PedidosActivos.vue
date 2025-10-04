@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pb-16">
+  <v-container>
     <v-row class="align-center justify-space-between mb-4">
       <v-col cols="auto">
         <h2 class="text-h5 font-weight-bold mb-0">📋 Selecciona una mesa</h2>
@@ -477,10 +477,4 @@ onUnmounted(() => {
   70%  { box-shadow: 0 0 0 12px rgba(76, 175, 80, 0); }
   100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
 }
-
-.pb-16 {
-  padding-bottom: 110px !important;
-}
-
 </style>
-
