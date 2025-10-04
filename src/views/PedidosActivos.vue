@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="pb-16">
     <v-row class="align-center justify-space-between mb-4">
       <v-col cols="auto">
         <h2 class="text-h5 font-weight-bold mb-0">📋 Selecciona una mesa</h2>
@@ -478,3 +478,8 @@ onUnmounted(() => {
   100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
 }
 </style>
+
+/* Asegura espacio para la barra de navegación inferior en móvil */
+.pb-16 {
+  padding-bottom: 80px !important;
+}
