@@ -287,16 +287,18 @@ const marcarDetallesComoPreparados = async (pedido) => {
   } catch (e) { console.error('Error al marcar detalles como preparados:', e) }
 }
 
-// Marcar como listo solo tras confirmación del backend y recargar pedidos
+/* listo (UI optimista) */
 const marcarPedidoListo = async (pedido) => {
+  const idx = pedidos.value.findIndex(p => p.id_pedido === pedido.id_pedido)
+  let backup = null
+  if (idx !== -1) { backup = { ...pedidos.value[idx] }; pedidos.value.splice(idx, 1) }
   try {
     await marcarDetallesComoPreparados(pedido)
-    await axios.put(`https://api-isabella-s-cakes.onrender.com/api/pedidos/${pedido.id_pedido}`, { estado: 'listo' })
+  await axios.put(`https://api-isabella-s-cakes.onrender.com/api/pedidos/${pedido.id_pedido}`, { estado: 'listo' })
     socket.emit('estado-pedido-actualizado', { id_pedido: pedido.id_pedido, estado: 'listo' })
-    // Recargar pedidos tras marcar como listo para evitar parpadeos
-    await cargarPedidos()
   } catch (err) {
     console.error('Error al marcar como listo:', err)
+    if (backup) pedidos.value.splice(idx, 0, backup)
   }
 }
 
