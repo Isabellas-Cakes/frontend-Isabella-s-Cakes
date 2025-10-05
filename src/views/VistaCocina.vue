@@ -207,20 +207,20 @@ const cargarPedidoConDetalles = async (id_pedido) => {
 }
 
 /* carga inicial */
+// Carga inicial y recarga robusta de pedidos
 const cargarPedidos = async () => {
   try {
-  const { data } = await axios.get('https://api-isabella-s-cakes.onrender.com/api/pedidos')
+    const { data } = await axios.get('https://api-isabella-s-cakes.onrender.com/api/pedidos')
     const activos = data.filter(p => ['pendiente', 'en preparación', 'listo', 'ocupado'].includes(p.estado))
-
+    const nuevosPedidos = []
     for (const p of activos) {
       const detalles = await fetchDetallesNoPreparados(p.id_pedido)
       const pedido = { ...p, detalles }
-      await iniciarAutomaticoEnCocina(pedido)   // arranque si viene pendiente/ sin inicio
-      pedidos.value.push(pedido)
+      await iniciarAutomaticoEnCocina(pedido)
+      nuevosPedidos.push(pedido)
     }
-
-    // ocultar tarjetas 'listo' que ya no tienen pendientes
-    pedidos.value = pedidos.value.filter(p => p.detalles.length || (p.estado !== 'listo'))
+    // Oculta tarjetas 'listo' que ya no tienen pendientes
+    pedidos.value = nuevosPedidos.filter(p => p.detalles.length || (p.estado !== 'listo'))
   } catch (err) {
     console.error('Error al cargar pedidos:', err)
   }
@@ -288,17 +288,16 @@ const marcarDetallesComoPreparados = async (pedido) => {
 }
 
 /* listo (UI optimista) */
+// Marcar como listo solo tras confirmación del backend y recargar pedidos
 const marcarPedidoListo = async (pedido) => {
-  const idx = pedidos.value.findIndex(p => p.id_pedido === pedido.id_pedido)
-  let backup = null
-  if (idx !== -1) { backup = { ...pedidos.value[idx] }; pedidos.value.splice(idx, 1) }
   try {
     await marcarDetallesComoPreparados(pedido)
-  await axios.put(`https://api-isabella-s-cakes.onrender.com/api/pedidos/${pedido.id_pedido}`, { estado: 'listo' })
+    await axios.put(`https://api-isabella-s-cakes.onrender.com/api/pedidos/${pedido.id_pedido}`, { estado: 'listo' })
     socket.emit('estado-pedido-actualizado', { id_pedido: pedido.id_pedido, estado: 'listo' })
+    // Recargar pedidos tras marcar como listo para evitar parpadeos
+    await cargarPedidos()
   } catch (err) {
     console.error('Error al marcar como listo:', err)
-    if (backup) pedidos.value.splice(idx, 0, backup)
   }
 }
 
@@ -374,10 +373,9 @@ onMounted(() => {
   cargarPedidos()
   cargarHistorial()
   intervalo = setInterval(() => {
-    // avisos y re-render
+    cargarPedidos() // fuerza recarga periódica para máxima sincronía
     pedidos.value = [...pedidos.value]
   }, 60000)
-  // refresco rápido para capturar cambios aun si el backend no retransmite
   refrescoRapido = setInterval(syncEnPreparacion, 5000)
 })
 
