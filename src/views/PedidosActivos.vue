@@ -273,14 +273,22 @@ function cerrarSesion() {
 
 const cargarMesas = async () => {
   try {
-  const { data } = await axios.get('https://api-isabella-s-cakes.onrender.com/api/mesas')
-    const guardados = getEstadosLS()
+    const { data } = await axios.get('https://api-isabella-s-cakes.onrender.com/api/mesas')
     if (!Array.isArray(data)) { mesas.value = []; return; }
+    // Solo persistimos estados distintos de 'libre', y si el backend dice 'libre', limpiamos localStorage
+    const guardados = getEstadosLS()
     mesas.value = data.map(m => {
       if (!m || typeof m !== 'object' || !m.id_mesa) return null;
-      return guardados[m.id_mesa]
-        ? { ...m, estado: guardados[m.id_mesa] }
-        : m
+      // Si el backend dice 'libre', limpiamos localStorage para esa mesa
+      if (normalizar(m.estado) === 'libre') {
+        clearEstadoLS(m.id_mesa)
+        return m
+      }
+      // Si hay un estado guardado y es diferente de 'libre', lo usamos
+      if (guardados[m.id_mesa] && normalizar(guardados[m.id_mesa]) !== 'libre') {
+        return { ...m, estado: guardados[m.id_mesa] }
+      }
+      return m
     }).filter(Boolean)
   } catch (error) {
     console.error('Error al cargar mesas:', error)
