@@ -70,7 +70,6 @@
                   <th>Consumo</th>
                   <th>Pagado</th>
                   <!-- <th>Pago tras Consumo</th> -->
-                  <th>Tiempo Logrado</th>
                 </tr>
               </thead>
               <tbody>
@@ -87,8 +86,6 @@
                   <td>{{ formatear(pedido.fin_consumo) }}</td>
                   <td>{{ mostrarMinutos(pedido.tiempo_consumo) }}</td>
                   <td>{{ formatear(pedido.fecha_pagado) }}</td>
-                  <td>{{ mostrarMinutos(pedido.pago_tras_consumo) }}</td>
-                  <td :class="['kpi-bold', getTiempoColorClass(pedido)]" :title="getTiempoTooltip(pedido)">{{ calcularTiempoPreparacion(pedido) }}</td>
                 </tr>
               </tbody>
             </table>
