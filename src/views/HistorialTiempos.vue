@@ -69,7 +69,7 @@
                   <th>Fin Consumo</th>
                   <th>Consumo</th>
                   <th>Pagado</th>
-                  <th>Pago tras Consumo</th>
+                  <!-- <th>Pago tras Consumo</th> -->
                   <th>Tiempo Preparación</th>
                   <th>Tiempo Pago</th>
                 </tr>
