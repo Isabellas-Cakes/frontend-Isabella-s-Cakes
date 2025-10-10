@@ -329,6 +329,14 @@ const cargarHistorial = async () => {
 onMounted(async () => {
   await cargarHistorial();
 });
+
+function calcularMinutos(pedido) {
+  if (!pedido.fecha_creacion || !pedido.fin_preparacion) return null;
+  const inicio = dayjs(pedido.fecha_creacion);
+  const fin = dayjs(pedido.fin_preparacion);
+  const minutos = fin.diff(inicio, 'minute');
+  return isNaN(minutos) ? null : minutos;
+}
 </script>
 
 <style scoped>
