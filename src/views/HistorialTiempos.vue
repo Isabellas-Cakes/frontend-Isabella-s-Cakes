@@ -148,24 +148,6 @@ const articulosPreparadosFlat = computed(() => {
   });
   return arr;
 });
-// Devuelve la clase de color para la celda de tiempo real
-function getTiempoColorClass(pedido) {
-  const t = calcularMinutos(pedido);
-  if (t === null) return '';
-  if (t <= 14) return 'tiempo-verde';
-  if (t > 14 && t <= 18) return 'tiempo-amarillo';
-  if (t > 18) return 'tiempo-rojo';
-  return '';
-}
-
-function getTiempoTooltip(pedido) {
-  const t = calcularMinutos(pedido);
-  if (t === null) return '';
-  if (t <= 14) return 'Excelente (≤14 min)';
-  if (t > 14 && t <= 18) return 'En límite (15-18 min)';
-  if (t > 18) return 'Crítico (>18 min)';
-  return '';
-}
 // KPIs resumen
 const totalVerde = computed(() => pedidosFiltradosRecientes.value.filter(p => {
   const t = calcularMinutosPreparacion(p);
@@ -196,14 +178,6 @@ function calcularMinutosPreparacion(pedido) {
   const minutos = fin.diff(inicio, 'minute');
   return isNaN(minutos) ? null : minutos;
 }
-
-const calcularTiempoPreparacion = (pedido) => {
-  if (!pedido.fecha_creacion || !pedido.fin_preparacion) return 'N/D';
-  const inicio = dayjs(pedido.fecha_creacion);
-  const fin = dayjs(pedido.fin_preparacion);
-  const minutos = fin.diff(inicio, 'minute');
-  return isNaN(minutos) ? 'N/D' : `${minutos} min`;
-};
 
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
