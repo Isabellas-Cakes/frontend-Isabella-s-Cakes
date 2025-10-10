@@ -5,12 +5,7 @@
     <h1 class="text-h4 text-md-h3 font-weight-bold mb-4">⏱️ Control de Tiempos Detallado</h1>
     <!-- KPIs resumen -->
     <v-row class="mb-6" dense>
-      <v-col cols="6" sm="3">
-        <div class="kpi-resumen kpi-total">
-          <div class="kpi-label">Total Movimientos</div>
-          <div class="kpi-value">{{ pedidosFiltradosRecientes.length }}</div>
-        </div>
-      </v-col>
+      <!-- Total Movimientos removido -->
       <v-col cols="6" sm="3">
         <div class="kpi-resumen kpi-verde">
           <div class="kpi-label">Excelente (≤14 min)</div>
@@ -31,8 +26,8 @@
       </v-col>
       <v-col cols="12" sm="12">
         <div class="kpi-resumen kpi-promedio">
-          <div class="kpi-label">Promedio Tiempo Real</div>
-            <div class="kpi-value kpi-total">{{ promedioTiempoReal }}</div>
+          <div class="kpi-label">Promedio Tiempo Preparación</div>
+            <div class="kpi-value kpi-total">{{ promedioTiempoPreparacion }}</div>
         </div>
       </v-col>
     </v-row>
@@ -75,7 +70,8 @@
                   <th>Consumo</th>
                   <th>Pagado</th>
                   <th>Pago tras Consumo</th>
-                  <th>Tiempo Real</th>
+                  <th>Tiempo Preparación</th>
+                  <th>Tiempo Pago</th>
                 </tr>
               </thead>
               <tbody>
@@ -93,7 +89,8 @@
                   <td>{{ mostrarMinutos(pedido.tiempo_consumo) }}</td>
                   <td>{{ formatear(pedido.fecha_pagado) }}</td>
                   <td>{{ mostrarMinutos(pedido.pago_tras_consumo) }}</td>
-                  <td :class="['kpi-bold', getTiempoColorClass(pedido)]" :title="getTiempoTooltip(pedido)">{{ calcularTiempoReal(pedido) }}</td>
+                  <td :class="['kpi-bold', getTiempoColorClass(pedido)]" :title="getTiempoTooltip(pedido)">{{ calcularTiempoPreparacion(pedido) }}</td>
+                  <td>{{ calcularTiempoPago(pedido) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -176,38 +173,46 @@ function getTiempoTooltip(pedido) {
 }
 // KPIs resumen
 const totalVerde = computed(() => pedidosFiltradosRecientes.value.filter(p => {
-  const t = calcularMinutos(p);
+  const t = calcularMinutosPreparacion(p);
   return t !== null && t <= 14;
 }).length);
 
 const totalAmarillo = computed(() => pedidosFiltradosRecientes.value.filter(p => {
-  const t = calcularMinutos(p);
+  const t = calcularMinutosPreparacion(p);
   return t !== null && t > 14 && t <= 18;
 }).length);
 
 const totalRojo = computed(() => pedidosFiltradosRecientes.value.filter(p => {
-  const t = calcularMinutos(p);
+  const t = calcularMinutosPreparacion(p);
   return t !== null && t > 20;
 }).length);
 
-const promedioTiempoReal = computed(() => {
-  const tiempos = pedidosFiltradosRecientes.value.map(p => calcularMinutos(p)).filter(t => t !== null);
+const promedioTiempoPreparacion = computed(() => {
+  const tiempos = pedidosFiltradosRecientes.value.map(p => calcularMinutosPreparacion(p)).filter(t => t !== null);
   if (!tiempos.length) return 'N/D';
   const prom = Math.round(tiempos.reduce((a, b) => a + b, 0) / tiempos.length);
   return `${prom} min`;
 });
 
-function calcularMinutos(pedido) {
-  if (!pedido.fecha_creacion || !pedido.fecha_pagado) return null;
+function calcularMinutosPreparacion(pedido) {
+  if (!pedido.fecha_creacion || !pedido.fin_preparacion) return null;
   const inicio = dayjs(pedido.fecha_creacion);
-  const fin = dayjs(pedido.fecha_pagado);
+  const fin = dayjs(pedido.fin_preparacion);
   const minutos = fin.diff(inicio, 'minute');
   return isNaN(minutos) ? null : minutos;
 }
-// Calcula el tiempo real entre inicio pedido y pagado
-const calcularTiempoReal = (pedido) => {
-  if (!pedido.fecha_creacion || !pedido.fecha_pagado) return 'N/D';
+
+const calcularTiempoPreparacion = (pedido) => {
+  if (!pedido.fecha_creacion || !pedido.fin_preparacion) return 'N/D';
   const inicio = dayjs(pedido.fecha_creacion);
+  const fin = dayjs(pedido.fin_preparacion);
+  const minutos = fin.diff(inicio, 'minute');
+  return isNaN(minutos) ? 'N/D' : `${minutos} min`;
+};
+
+const calcularTiempoPago = (pedido) => {
+  if (!pedido.fin_preparacion || !pedido.fecha_pagado) return 'N/D';
+  const inicio = dayjs(pedido.fin_preparacion);
   const fin = dayjs(pedido.fecha_pagado);
   const minutos = fin.diff(inicio, 'minute');
   return isNaN(minutos) ? 'N/D' : `${minutos} min`;
