@@ -70,8 +70,7 @@
                   <th>Consumo</th>
                   <th>Pagado</th>
                   <!-- <th>Pago tras Consumo</th> -->
-                  <th>Tiempo Preparación</th>
-                  <th>Tiempo Pago</th>
+                  <th>Tiempo Logrado</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,7 +89,6 @@
                   <td>{{ formatear(pedido.fecha_pagado) }}</td>
                   <td>{{ mostrarMinutos(pedido.pago_tras_consumo) }}</td>
                   <td :class="['kpi-bold', getTiempoColorClass(pedido)]" :title="getTiempoTooltip(pedido)">{{ calcularTiempoPreparacion(pedido) }}</td>
-                  <td>{{ calcularTiempoPago(pedido) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -240,59 +238,49 @@ import dayjs from "dayjs";
                       pedidos: { type: Array, required: true }
                     },
                     setup(props) {
-                      // Calcular eficiencia acumulada por pedido (simula evolución en el tiempo)
-                      const labels = computed(() => props.pedidos.map(p => `#${p.id_pedido}`));
-                      const dataEficiencia = computed(() => {
-                        let verdes = 0;
-                        return props.pedidos.map((p, i) => {
-                          const t = p.fecha_creacion && p.fecha_pagado ? dayjs(p.fecha_pagado).diff(dayjs(p.fecha_creacion), 'minute') : null;
-                          if (t !== null && t <= 14) verdes++;
-                          return Math.round((verdes / (i + 1)) * 100);
-                        });
-                      });
-                      const data = computed(() => ({
-                        labels: labels.value,
+                      // Datos de comparación antes y después de la digitalización
+                      const labels = ['Errores en pedidos (%)', 'Tiempo promedio de atención (min)', 'Tasa de satisfacción del cliente (%)'];
+                      const dataDesempeno = {
+                        labels,
                         datasets: [
                           {
-                            label: 'Eficiencia acumulada (%)',
-                            data: dataEficiencia.value,
-                            fill: false,
-                            borderColor: '#1abc6c',
-                            backgroundColor: '#1abc6c',
-                            tension: 0.3,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#fff',
-                            pointBorderColor: '#1abc6c',
-                          }
-                        ]
-                      }));
+                            label: 'Antes de Digitalización',
+                            data: [35, 20, 65],
+                            backgroundColor: '#ff6384',
+                            borderColor: '#ff6384',
+                            borderWidth: 1,
+                          },
+                          {
+                            label: 'Después de Digitalización',
+                            data: [10, 18, 90],
+                            backgroundColor: '#36a2eb',
+                            borderColor: '#36a2eb',
+                            borderWidth: 1,
+                          },
+                        ],
+                      };
+
                       const options = {
                         responsive: true,
                         plugins: {
-                          legend: { display: false },
+                          legend: { display: true },
                           tooltip: {
                             callbacks: {
-                              label: ctx => `Eficiencia: ${ctx.parsed.y}%`
+                              label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
                             }
                           }
                         },
                         scales: {
                           y: {
-                            min: 0,
-                            max: 100,
-                            ticks: {
-                              callback: v => v + '%',
-                              stepSize: 20
-                            },
-                            title: { display: true, text: 'Porcentaje' }
+                            beginAtZero: true,
+                            title: { display: true, text: 'Valores' },
                           },
                           x: {
-                            grid: { display: false },
-                            title: { display: true, text: 'Pedidos' }
-                          }
-                        }
+                            title: { display: true, text: 'Indicadores' },
+                          },
+                        },
                       };
-                      return () => h(Line, { data: data.value, options });
+                      return () => h(Line, { data: dataDesempeno, options });
                     }
                   });
 
