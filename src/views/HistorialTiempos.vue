@@ -208,13 +208,6 @@ const calcularTiempoPreparacion = (pedido) => {
   return isNaN(minutos) ? 'N/D' : `${minutos} min`;
 };
 
-const calcularTiempoPago = (pedido) => {
-  if (!pedido.fin_preparacion || !pedido.fecha_pagado) return 'N/D';
-  const inicio = dayjs(pedido.fin_preparacion);
-  const fin = dayjs(pedido.fecha_pagado);
-  const minutos = fin.diff(inicio, 'minute');
-  return isNaN(minutos) ? 'N/D' : `${minutos} min`;
-};
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -234,10 +227,7 @@ import dayjs from "dayjs";
 
                   const LineChartEficiencia = defineComponent({
                     name: 'LineChartEficiencia',
-                    props: {
-                      pedidos: { type: Array, required: true }
-                    },
-                    setup(props) {
+                    setup() {
                       // Datos de comparación antes y después de la digitalización
                       const labels = ['Errores en pedidos (%)', 'Tiempo promedio de atención (min)', 'Tasa de satisfacción del cliente (%)'];
                       const dataDesempeno = {
